@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblibcan.a  CMakeFiles/libcan.dir/src/can.cpp.o CMakeFiles/libcan.dir/src/can_frame.cpp.o CMakeFiles/libcan.dir/src/can_filter.cpp.o
-/usr/bin/ranlib liblibcan.a
