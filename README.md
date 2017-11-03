@@ -19,20 +19,24 @@ Default the library will be built for the S4 Comm Pro X device. If you want to b
 set the following option during configuration with cmake:
 
 ```
+
 $ mkdir build
 
 $ cd build/
 
 $ cmake -D BUILD_S7:ON ../
+
 ```
 
 The libraries will build as static libraries by default. If you need shared libraries use the following configuration
 option during configuration step:
 
 ```
+
 $ mkdir build
 
 $ cd build/
 
 $ cmake -D BUILD_SHARED:ON ../
+
 ```
