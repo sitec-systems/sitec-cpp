@@ -1,3 +1,7 @@
+// Copyright 2017 sitec systems GmbH. All rights reserved
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 #include "../interface_configuration.hpp"
 
 #include <cstdio>
@@ -11,15 +15,21 @@
 
 #include "../interface_state.hpp"
 
-namespace peripheral {
+using std::runtime_error;
+using std::system_error;
+using std::string;
+using std::system_category;
+using std::stringstream;
+
+namespace sitec {
 namespace can {
 
 namespace {
-const std::string CAN0_TERMINATOR("500");
-const std::string CAN1_TERMINATOR("502");
-const std::string CAN0_INTERFACE("can0");
-const std::string CAN1_INTERFACE("can1");
-const std::string GPIO_BASEPATH("/sys/class/gpio/gpio");
+const string CAN0_TERMINATOR("500");
+const string CAN1_TERMINATOR("502");
+const string CAN0_INTERFACE("can0");
+const string CAN1_INTERFACE("can1");
+const string GPIO_BASEPATH("/sys/class/gpio/gpio");
 const char CAN0_TRANSCEIVER[] = "/sys/bus/spi/drivers/tja1145/spi2.0/modectrl";
 const char CAN0_ENABLE[] = "normal";
 const char CAN0_DISABLE[] = "standby";
@@ -27,12 +37,10 @@ const char CAN0_DISABLE[] = "standby";
 
 InterfaceConfiguration::InterfaceConfiguration(const char* ifaceName,
                                                const int bitrate,
-                                               const bool terminator,
-                                               const bool autoShutdown) {
-  this->ifaceName = std::string(ifaceName);
+                                               const bool terminator) {
+  this->ifaceName = string(ifaceName);
   this->bitrate = bitrate;
   this->terminator = terminator;
-  this->autoShutdown = autoShutdown;
 }
 
 InterfaceConfiguration::~InterfaceConfiguration() { down(); }
@@ -47,7 +55,7 @@ void InterfaceConfiguration::up() {
 
   auto ret = can_do_start(ifaceName.c_str());
   if (ret != 0) {
-    throw std::system_error(EIO, std::system_category());
+    throw system_error(EIO, system_category());
   }
 
   switchTerminator(terminator);
@@ -57,7 +65,7 @@ void InterfaceConfiguration::up() {
 void InterfaceConfiguration::down() {
   auto ret = can_do_stop(ifaceName.c_str());
   if (ret != 0) {
-    throw std::system_error(EIO, std::system_category());
+    throw system_error(EIO, system_category());
   }
 
   switchTerminator(false);
@@ -69,7 +77,7 @@ InterfaceState InterfaceConfiguration::getState() {
 
   auto ret = can_get_state(ifaceName.c_str(), &state);
   if (ret != 0) {
-    throw std::system_error(EIO, std::system_category());
+    throw system_error(EIO, system_category());
   }
 
   switch (state) {
@@ -93,12 +101,12 @@ InterfaceState InterfaceConfiguration::getState() {
 
 void InterfaceConfiguration::configureBitrate() {
   if (can_set_bitrate(ifaceName.c_str(), bitrate) != 0) {
-    throw std::system_error(EIO, std::system_category());
+    throw system_error(EIO, system_category());
   }
 }
 
 void InterfaceConfiguration::switchTerminator(const bool state) {
-  std::stringstream ss;
+  stringstream ss;
   ss << GPIO_BASEPATH;
 
   if (ifaceName == CAN0_INTERFACE) {
@@ -111,7 +119,7 @@ void InterfaceConfiguration::switchTerminator(const bool state) {
   auto file = fopen(ss.str().c_str(), "w");
 
   if (file == nullptr) {
-    throw std::runtime_error("Can't switch Terminator");
+    throw runtime_error("Can't switch Terminator");
   }
 
   if (state) {
@@ -130,7 +138,7 @@ void InterfaceConfiguration::switchTransceiver(const bool state) {
 
   auto file = fopen(CAN0_TRANSCEIVER, "w");
   if (file == nullptr) {
-    throw std::runtime_error("Can't switch CAN0 transceiver");
+    throw runtime_error("Can't switch CAN0 transceiver");
   }
 
   if (state) {
@@ -142,4 +150,4 @@ void InterfaceConfiguration::switchTransceiver(const bool state) {
   fclose(file);
 }
 }  // namespace can
-}  // namespace peripheral
+}  // namespace sitec

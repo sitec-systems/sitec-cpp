@@ -1,4 +1,8 @@
-﻿#include "can_frame.hpp"
+﻿// Copyright 2017 sitec systems GmbH. All rights reserved
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+#include "can_frame.hpp"
 
 #include <cstdio>
 #include <ostream>
@@ -8,11 +12,15 @@
 
 #include <linux/can/raw.h>
 
-namespace peripheral {
+using std::string;
+using std::stringstream;
+using std::vector;
+
+namespace sitec {
 namespace can {
 
 CanFrame::CanFrame(const unsigned int id,
-                   const std::vector<unsigned char> &data)
+                   const vector<unsigned char> &data)
     : id(id), data(data) {}
 
 CanFrame::CanFrame(struct can_frame *frame) {
@@ -24,7 +32,7 @@ CanFrame::CanFrame(struct can_frame *frame) {
 
 unsigned int CanFrame::getId() { return id; }
 
-std::vector<unsigned char> CanFrame::getData() { return data; }
+vector<unsigned char> CanFrame::getData() { return data; }
 
 void CanFrame::getFrameStruct(struct can_frame *frame) {
   frame->can_id = id;
@@ -35,9 +43,9 @@ void CanFrame::getFrameStruct(struct can_frame *frame) {
   }
 }
 
-std::string CanFrame::to_string() {
+string CanFrame::to_string() {
   char buf[96];
-  std::stringstream ss;
+  stringstream ss;
 
   sprintf(buf, "0x%x ", id);
   ss << buf << data.size() << " -> ";
@@ -51,4 +59,4 @@ std::string CanFrame::to_string() {
 }
 
 } // namespace can
-} // namespace peripheral
+} // namespace sitec

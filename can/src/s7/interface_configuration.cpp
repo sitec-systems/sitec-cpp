@@ -1,4 +1,8 @@
-﻿#include "../interface_configuration.hpp"
+﻿// Copyright 2017 sitec systems GmbH. All rights reserved
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+#include "../interface_configuration.hpp"
 
 #include <cstdio>
 #include <iostream>
@@ -15,22 +19,28 @@
 
 #include "../interface_state.hpp"
 
-namespace peripheral {
+using std::runtime_error;
+using std::system_error;
+using std::string;
+using std::system_category;
+using std::stringstream;
+
+namespace sitec {
 namespace can {
 
 namespace {
-const std::string CAN0_TERMINATOR("498");
-const std::string CAN1_TERMINATOR("501");
-const std::string CAN0_SLEEP("499");
-const std::string CAN1_SLEEP("500");
-const std::string CAN0_INTERFACE("can0");
-const std::string CAN1_INTERFACE("can1");
-const std::string GPIO_BASEPATH("/sys/class/gpio/gpio");
-const std::string GPIO_EXPORT("/sys/class/gpio/export");
-const std::string GPIO_UNEXPORT("/sys/class/gpio/unexport");
+const string CAN0_TERMINATOR("498");
+const string CAN1_TERMINATOR("501");
+const string CAN0_SLEEP("499");
+const string CAN1_SLEEP("500");
+const string CAN0_INTERFACE("can0");
+const string CAN1_INTERFACE("can1");
+const string GPIO_BASEPATH("/sys/class/gpio/gpio");
+const string GPIO_EXPORT("/sys/class/gpio/export");
+const string GPIO_UNEXPORT("/sys/class/gpio/unexport");
 
-const bool isExported(std::string gpio) {
-  std::stringstream ss;
+const bool isExported(string gpio) {
+  stringstream ss;
   ss << GPIO_BASEPATH << gpio;
 
   struct stat buffer;
@@ -45,7 +55,7 @@ const bool isExported(std::string gpio) {
 /// @brief Export a GPIO to userspace via sysfs
 ///
 /// @param gpio String with the number of the gpio, e. g. 499
-const void exportGpio(std::string gpio) {
+const void exportGpio(string gpio) {
   if (isExported(gpio)) {
     return;
   }
@@ -69,7 +79,7 @@ const void exportGpio(std::string gpio) {
 /// @brief Unexport a GPIO from userspace via sysfs
 ///
 /// @param gpio String with the number of the gpio, e. g. 499
-const void unexportGpio(std::string gpio) {
+const void unexportGpio(string gpio) {
   auto f = fopen(GPIO_UNEXPORT.c_str(), "w");
   if (!f) {
     throw std::runtime_error("Can't export GPIO");
@@ -86,8 +96,8 @@ const void unexportGpio(std::string gpio) {
   return;
 }
 
-const void configureAsOutput(std::string gpio) {
-  std::stringstream ss;
+const void configureAsOutput(string gpio) {
+  stringstream ss;
   ss << GPIO_BASEPATH;
   ss << gpio;
 
@@ -106,16 +116,14 @@ const void configureAsOutput(std::string gpio) {
 
   fclose(f);
 }
-}
+} // namespace
 
 InterfaceConfiguration::InterfaceConfiguration(const char *ifaceName,
                                                const int bitrate,
-                                               const bool terminator,
-                                               const bool autoShutdown) {
-  this->ifaceName = std::string(ifaceName);
+                                               const bool terminator) {
+  this->ifaceName = string(ifaceName);
   this->bitrate = bitrate;
   this->terminator = terminator;
-  this->autoShutdown = autoShutdown;
 }
 
 InterfaceConfiguration::~InterfaceConfiguration() { down(); }
@@ -201,7 +209,7 @@ void InterfaceConfiguration::configureBitrate() {
 }
 
 void InterfaceConfiguration::switchTerminator(const bool state) {
-  std::stringstream ss;
+  stringstream ss;
   ss << GPIO_BASEPATH;
 
   if (ifaceName == CAN0_INTERFACE) {
@@ -227,7 +235,7 @@ void InterfaceConfiguration::switchTerminator(const bool state) {
 }
 
 void InterfaceConfiguration::switchTransceiver(const bool state) {
-  std::stringstream ss;
+  stringstream ss;
   ss << GPIO_BASEPATH;
 
   if (ifaceName == CAN0_INTERFACE) {
@@ -253,4 +261,4 @@ void InterfaceConfiguration::switchTransceiver(const bool state) {
 }
 
 }  // namespace can
-}  // namespace peripheral
+}  // namespace sitec

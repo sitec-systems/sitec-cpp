@@ -1,3 +1,7 @@
+// Copyright 2017 sitec systems GmbH. All rights reserved
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 #pragma once
 
 #include <string>
@@ -6,29 +10,43 @@
 #include "can_filter.hpp"
 #include "can_frame.hpp"
 
-namespace peripheral {
+namespace sitec {
 namespace can {
 
-class Can
-{
+//! Class which abstracts a CAN socket
+class Can {
 public:
-    Can(const char* networkInterface);
-    ~Can();
-    void openInterface();
-    void setFilter(const std::vector<CanFilter>& filter);
-    void setFilter(const CanFilter& filter);
-    void disableFilter();
-    CanFrame receiveFrame();
-    void sendFrame(CanFrame& frame);
-    void closeInterface();
+  //! Constructor for Can object.
+  //!
+  //! @param networkInterface Takes the name of the network interface (e.g. can0)
+  Can ( const char* networkInterface );
+
+  //! Destructor for Can object.
+  //!
+  //! Closing the open socket to clean up the system
+  ~Can();
+
+  //! Open the socket for communication
+  //!
+  //! @throws std::system_error if the socket can't be open properly.
+  void open();
+
+  //! Setting multiple filters for the socket
+  //!
+  //! @param filter std::vector object which contains CanFilter objects
+  //! @throws std::system_error if the filter can't be set.
+  void setFilter ( const std::vector<CanFilter>& filter );
+  void setFilter ( const CanFilter& filter );
+  void disableFilter();
+  CanFrame receiveFrame();
+  void sendFrame ( CanFrame& frame );
+  void destroy();
 
 private:
-    void configureInterface();
-
-    std::string networkInterface; 
-    unsigned int bitrate;
-    int sock = 0;
+  std::string networkInterface;
+  unsigned int bitrate;
+  int sock = 0;
 };
 
 } // namespace can
-} // namespace peripheral
+} // namespace sitec
