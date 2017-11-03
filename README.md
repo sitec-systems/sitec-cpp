@@ -18,25 +18,17 @@ you need to configure the machine which are you building for.
 Default the library will be built for the S4 Comm Pro X device. If you want to build for the S7 Track Pro X
 set the following option during configuration with cmake:
 
-```
-
+```bash
 $ mkdir build
-
 $ cd build/
-
 $ cmake -D BUILD_S7:ON ../
-
 ```
 
 The libraries will build as static libraries by default. If you need shared libraries use the following configuration
 option during configuration step:
 
-```
-
+```bash
 $ mkdir build
-
 $ cd build/
-
 $ cmake -D BUILD_SHARED:ON ../
-
 ```
