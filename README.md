@@ -20,7 +20,9 @@ set the following option during configuration with cmake:
 
 ```
 $ mkdir build
+
 $ cd build/
+
 $ cmake -D BUILD_S7:ON ../
 ```
 
@@ -29,6 +31,8 @@ option during configuration step:
 
 ```
 $ mkdir build
+
 $ cd build/
+
 $ cmake -D BUILD_SHARED:ON ../
 ```
