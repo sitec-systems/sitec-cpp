@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -15,11 +17,12 @@ namespace can {
 
 //! Class which abstracts a CAN socket
 class Can {
-public:
+ public:
   //! Constructor for Can object.
   //!
-  //! @param networkInterface Takes the name of the network interface (e.g. can0)
-  Can ( const char* networkInterface );
+  //! @param networkInterface Takes the name of the network interface (e.g.
+  //! can0)
+  Can(const char* networkInterface);
 
   //! Destructor for Can object.
   //!
@@ -35,18 +38,19 @@ public:
   //!
   //! @param filter std::vector object which contains CanFilter objects
   //! @throws std::system_error if the filter can't be set.
-  void setFilter ( const std::vector<CanFilter>& filter );
-  void setFilter ( const CanFilter& filter );
+  void setFilter(const std::vector<CanFilter>& filter);
+  void setFilter(const CanFilter& filter);
+  void setRecvTimeout();
   void disableFilter();
   CanFrame receiveFrame();
-  void sendFrame ( CanFrame& frame );
+  void sendFrame(CanFrame& frame);
   void destroy();
 
-private:
+ private:
   std::string networkInterface;
   unsigned int bitrate;
   int sock = 0;
 };
 
-} // namespace can
-} // namespace sitec
+}  // namespace can
+}  // namespace sitec

@@ -10,25 +10,25 @@ set(SITEC_CPP_CAN_INCLUDEDIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if (BUILD_SHARED)
   add_library(libcan SHARED 
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/can.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/can_frame.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/can_filter.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can_frame.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can_filter.cpp
       )
 else()
   add_library(libcan STATIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/can.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/can_frame.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/can_filter.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can_frame.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/can_filter.cpp
       )
 endif(BUILD_SHARED)
 
 if (BUILD_MACHINE_S7)
   add_library(libinterface_configuration STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/s7/interface_configuration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s7/interface_configuration.cpp
     )
 else()
   add_library(libinterface_configuration STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/s4/interface_configuration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/s4/interface_configuration.cpp
     )
 endif(BUILD_MACHINE_S7)
 
