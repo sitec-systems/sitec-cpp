@@ -8,18 +8,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(SITEC_CPP_CAN_INCLUDEDIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
+set(canlib_SRCS
+  ${CMAKE_CURRENT_SOURCE_DIR}/can.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/can_frame.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/can_filter.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/timeout.cpp
+  )
+
 if (BUILD_SHARED)
-  add_library(libcan SHARED 
-      ${CMAKE_CURRENT_SOURCE_DIR}/can.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/can_frame.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/can_filter.cpp
-      )
+  add_library(libcan SHARED ${canlib_SRCS})
 else()
-  add_library(libcan STATIC
-      ${CMAKE_CURRENT_SOURCE_DIR}/can.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/can_frame.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/can_filter.cpp
-      )
+  add_library(libcan STATIC ${canlib_SRCS})
 endif(BUILD_SHARED)
 
 if (BUILD_MACHINE_S7)
