@@ -10,17 +10,20 @@
 #include <system_error>
 #include <vector>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #include "can_filter.hpp"
 #include "can_frame.hpp"
+#include "timeout.hpp"
 
 using std::string;
 using std::system_error;
@@ -112,7 +115,7 @@ CanFrame Can::receiveFrame() {
   struct can_frame frame;
   auto ret = read(sock, &frame, sizeof(struct can_frame));
   if (ret < 0) {
-    throw system_error(EIO, system_category());
+    throw system_error(errno, system_category());
   }
 
   return CanFrame(&frame);
@@ -127,10 +130,31 @@ void Can::sendFrame(CanFrame &frame) {
   frame.getFrameStruct(&ll_frame);
 
   auto ret = write(sock, &ll_frame, sizeof(struct can_frame));
+
   if (ret < 0) {
+    if (errno == ETIMEDOUT) {
+      throw system_error(ETIMEDOUT, system_category());
+    } else {
+      throw system_error(EIO, system_category());
+    }
+  }
+}
+
+void Can::setRecvTimeout(Timeout timeout) {
+  auto tv = timeout.toTimevalStruct();
+  auto ret = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
+  if (ret != 0) {
     throw system_error(EIO, system_category());
   }
 }
 
-} // namespace can
-} // namespace sitec
+void Can::setSendTimeout(Timeout timeout) {
+  auto tv = timeout.toTimevalStruct();
+  auto ret = setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
+  if (ret != 0) {
+    throw system_error(EIO, system_category());
+  }
+}
+
+}  // namespace can
+}  // namespace sitec

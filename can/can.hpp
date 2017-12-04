@@ -11,6 +11,7 @@
 
 #include "can_filter.hpp"
 #include "can_frame.hpp"
+#include "timeout.hpp"
 
 namespace sitec {
 namespace can {
@@ -40,7 +41,8 @@ class Can {
   //! @throws std::system_error if the filter can't be set.
   void setFilter(const std::vector<CanFilter>& filter);
   void setFilter(const CanFilter& filter);
-  void setRecvTimeout();
+  void setRecvTimeout(Timeout timeout);
+  void setSendTimeout(Timeout timeout);
   void disableFilter();
   CanFrame receiveFrame();
   void sendFrame(CanFrame& frame);
