@@ -5,6 +5,7 @@
 #include <exception>
 #include <future>
 #include <iostream>
+#include <system_error>
 
 #include <can/can.hpp>
 #include <can/can_filter.hpp>
@@ -31,6 +32,7 @@ int main(int ac, char **av) {
     can0.open();
     can1.open();
     can1.setFilter(FILTER);
+    can1.setRecvTimeout(Timeout(2, 0));
 
     CanFrame frame1(0x123, {0xc});
     CanFrame frame2(0x003, {0xfc, 0x0e});
@@ -42,8 +44,14 @@ int main(int ac, char **av) {
     auto frame = can1.receiveFrame();
     cout << "Received frame on can1 " << frame.to_string() << '\n';
 
-  } catch (exception &e) {
-    cout << e.what() << '\n';
+    can1.receiveFrame();  // This one times out
+
+  } catch (system_error &e) {
+    if (e.code() == errc::timed_out) {
+      cout << "Receiving is timedout\n";
+    } else {
+      cout << e.what() << '\n';
+    }
   }
 
   return 0;
