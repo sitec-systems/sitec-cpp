@@ -1,4 +1,4 @@
-// Copyright 2017 sitec systems GmbH. All rights reserved
+// Copyright 2018 sitec systems GmbH. All rights reserved
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -32,7 +32,6 @@ int main(int ac, char **av) {
     can0.open();
     can1.open();
     can1.setFilter(FILTER);
-    can1.setRecvTimeout(Timeout(2, 0));
 
     CanFrame frame1(0x123, {0xc});
     CanFrame frame2(0x003, {0xfc, 0x0e});
@@ -44,6 +43,8 @@ int main(int ac, char **av) {
     auto frame = can1.receiveFrame();
     cout << "Received frame on can1 " << frame.to_string() << '\n';
 
+    can1.setRecvTimeout(Timeout(2, 0));
+    can1.enableRecvTimeout();
     can1.receiveFrame();  // This one times out
 
   } catch (system_error &e) {
