@@ -1,4 +1,4 @@
-// Copyright 2017 sitec systems GmbH. All rights reserved
+// Copyright 2017, 2018 sitec systems GmbH. All rights reserved
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -43,6 +43,8 @@ class Can {
   void setFilter(const CanFilter& filter);
   void setRecvTimeout(Timeout timeout);
   void setSendTimeout(Timeout timeout);
+  void disableRecvTimeout();
+  void enableRecvTimeout();
   void disableFilter();
   CanFrame receiveFrame();
   void sendFrame(CanFrame& frame);
@@ -52,6 +54,11 @@ class Can {
   std::string networkInterface;
   unsigned int bitrate;
   int sock = 0;
+  Timeout recvTimeout;
+  Timeout sendTimeout;
+  bool recvTimeoutEnable;
+
+  int doRecvSelect(fd_set* fds);
 };
 
 }  // namespace can

@@ -1,4 +1,4 @@
-﻿// Copyright 2017 sitec systems GmbH. All rights reserved
+﻿// Copyright 2017, 2018 sitec systems GmbH. All rights reserved
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -34,7 +34,14 @@ using std::runtime_error;
 namespace sitec {
 namespace can {
 
-Can::Can(const char *networkInterface) {
+namespace {
+const Timeout INIT_TIMEOUT(0, 0);
+}  // namespace
+
+Can::Can(const char *networkInterface)
+    : recvTimeout(INIT_TIMEOUT),
+      sendTimeout(INIT_TIMEOUT),
+      recvTimeoutEnable(false) {
   this->networkInterface = string(networkInterface);
 }
 
@@ -112,8 +119,19 @@ CanFrame Can::receiveFrame() {
     throw runtime_error("Socket is not open");
   }
 
+  fd_set fds;
+  FD_ZERO(&fds);
+  FD_SET(sock, &fds);
+
+  auto ret = doRecvSelect(&fds);
+  if (ret == -1) {
+    throw system_error(errno, system_category());
+  } else if (ret == 0) {
+    throw system_error(ETIMEDOUT, system_category());
+  }
+
   struct can_frame frame;
-  auto ret = read(sock, &frame, sizeof(struct can_frame));
+  ret = read(sock, &frame, sizeof(struct can_frame));
   if (ret < 0) {
     throw system_error(errno, system_category());
   }
@@ -140,20 +158,28 @@ void Can::sendFrame(CanFrame &frame) {
   }
 }
 
-void Can::setRecvTimeout(Timeout timeout) {
-  auto tv = timeout.toTimevalStruct();
-  auto ret = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
-  if (ret != 0) {
-    throw system_error(EIO, system_category());
-  }
-}
+void Can::setRecvTimeout(Timeout timeout) { recvTimeout = timeout; }
 
 void Can::setSendTimeout(Timeout timeout) {
+  sendTimeout = timeout;
   auto tv = timeout.toTimevalStruct();
   auto ret = setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv));
   if (ret != 0) {
     throw system_error(EIO, system_category());
   }
+}
+
+void Can::enableRecvTimeout() { recvTimeoutEnable = true; }
+
+void Can::disableRecvTimeout() { recvTimeoutEnable = false; }
+
+int Can::doRecvSelect(fd_set *fds) {
+  if (recvTimeoutEnable) {
+    auto tv = recvTimeout.toTimevalStruct();
+    return select(sock + 1, fds, nullptr, nullptr, &tv);
+  }
+
+  return select(sock + 1, fds, nullptr, nullptr, nullptr);
 }
 
 }  // namespace can
