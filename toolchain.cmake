@@ -2,8 +2,8 @@
 # This is important for cross-compiling.
 set( CMAKE_SYSTEM_NAME Linux )
 set( CMAKE_SYSTEM_PROCESSOR arm )
-set( SDKSYSROOT /opt/poky/2.1/sysroots/cortexa9hf-neon-poky-linux-gnueabi)
-set( TOOLCHAIN_PATH /opt/poky/2.1/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi )
+set( SDKSYSROOT /opt/poky/2.1.3/sysroots/cortexa9hf-neon-poky-linux-gnueabi)
+set( TOOLCHAIN_PATH /opt/poky/2.1.3/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi )
 set( CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/arm-poky-linux-gnueabi-gcc )
 set( CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/arm-poky-linux-gnueabi-g++ )
 set( CMAKE_ASM_COMPILER ${TOOLCHAIN_PATH}/arm-poky-linux-gnueabi-gcc )
